@@ -26,7 +26,7 @@ def script_load(settings_):
 
 def script_properties():
     props = obs.obs_properties_create()
-
+    obs.obs_properties_add_bool(props, "disable", "Disable All Monitorings")
     obs.obs_properties_add_editable_list(props, 'ignored', 'Ignored Sources', obs.OBS_EDITABLE_LIST_TYPE_STRINGS, None, None)
 
     return props
@@ -43,6 +43,12 @@ def monitor_source_callback(calldata):
 
 def monitor_source(source):
     ignored = obs.obs_data_get_array(settings, 'ignored')
+    disable_all = obs.obs_data_get_bool(settings, 'disable')
+    if disable_all:
+        print(f'Disabling monitoring "{obs.obs_source_get_name(source)}"')
+        obs.obs_source_set_monitoring_type(source, obs.OBS_MONITORING_TYPE_NONE)
+        return
+
 
     for idx in range(obs.obs_data_array_count(ignored)):
         ignored_source_data = obs.obs_data_array_item(ignored, idx)
